@@ -19,7 +19,7 @@ public class NarcoticManager {
      * @param narcotic - the narcotic
      */
     public void registerNarcotic (Narcotic narcotic){
-        narcotics.computeIfAbsent(narcotic.getId(), id -> narcotic);
+        narcotics.computeIfAbsent(narcotic.getId(), id -> narcotic).onRegister();;
     }
 
     public Collection<Narcotic> getNarcotics() {
