@@ -31,7 +31,7 @@ public class NarcoticListener implements Listener {
         if(e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         // Make sure an item is involved in this event
-        if(e.getItem() == null || e.getItem().hasItemMeta()) return;
+        if(e.getItem() == null || !e.getItem().hasItemMeta()) return;
 
         // Apply narcotic effect
         narcoticManager.getNarcotics()
