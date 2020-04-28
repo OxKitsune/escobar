@@ -1,0 +1,6 @@
+name: Escobar
+version: ${project.version}
+main: com.kitsune.escobar.Escobar
+api-version: 1.13
+authors: [kitsune]
+description: Plugin for the plebs SMP server
