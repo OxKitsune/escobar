@@ -1,5 +1,7 @@
 package com.kitsune.escobar.narcotic;
 
+import com.kitsune.escobar.narcotic.listener.NarcoticListener;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +13,8 @@ public class NarcoticManager {
 
     public NarcoticManager () {
         this.narcotics = new HashMap<>();
+
+        new NarcoticListener(this);
     }
 
     /**
@@ -19,7 +23,7 @@ public class NarcoticManager {
      * @param narcotic - the narcotic
      */
     public void registerNarcotic (Narcotic narcotic){
-        narcotics.computeIfAbsent(narcotic.getId(), id -> narcotic).onRegister();;
+        narcotics.computeIfAbsent(narcotic.getId(), id -> narcotic).onRegister();
     }
 
     public Collection<Narcotic> getNarcotics() {
