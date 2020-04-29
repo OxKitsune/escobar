@@ -1,5 +1,6 @@
 package com.kitsune.escobar;
 
+import com.kitsune.escobar.command.HatCommand;
 import com.kitsune.escobar.narcotic.NarcoticManager;
 import com.kitsune.escobar.narcotic.impl.Cocaine;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,7 +24,7 @@ public final class Escobar extends JavaPlugin {
 
         narcoticManager.registerNarcotic(new Cocaine());
 
-
+        getCommand("hat").setExecutor(new HatCommand());
     }
 
     @Override

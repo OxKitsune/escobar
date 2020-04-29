@@ -1,6 +1,9 @@
 name: Escobar
 version: ${project.version}
 main: com.kitsune.escobar.Escobar
-api-version: 1.13
+api-version: 1.15
 authors: [kitsune]
 description: Plugin for the plebs SMP server
+commands:
+  hat:
+    description: "Turns items into hats!"

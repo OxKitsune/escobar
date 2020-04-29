@@ -59,6 +59,9 @@ public class Cocaine extends Narcotic {
 
         // Duration is in ticks, so multiply by 20
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 * 20, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 40 * 20, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 40 * 20, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 40 * 20, 1));
 
         // Decrease amount
         player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
