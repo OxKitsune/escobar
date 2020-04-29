@@ -25,7 +25,7 @@ public class HatCommand implements CommandExecutor {
         if(player.getEquipment().getItemInMainHand() != null && player.getEquipment().getItemInMainHand().getType() != Material.AIR){
 
             // Save the current helmet
-            ItemStack oldHelmet = player.getEquipment().getHelmet().clone();
+            ItemStack oldHelmet = player.getEquipment().getHelmet() != null ? player.getEquipment().getHelmet().clone() : null;
 
             // Put the item on their head
             player.getEquipment().setHelmet(player.getEquipment().getItemInMainHand());

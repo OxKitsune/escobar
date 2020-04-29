@@ -39,7 +39,7 @@ public class Cocaine extends Narcotic {
 
     @Override
     public String getDisplayName() {
-        return ChatColor.BOLD + "Cocaine";
+        return ChatColor.RESET + "" + ChatColor.BOLD + "Cocaine";
     }
 
     @Override
@@ -61,13 +61,13 @@ public class Cocaine extends Narcotic {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 * 20, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 40 * 20, 1));
         player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 40 * 20, 1));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 40 * 20, 1));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 40 * 20, 1));
 
         // Decrease amount
         player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
 
         // Play "Sniff" sound
-        player.playSound(player.getLocation(), Sound.BLOCK_BAMBOO_SAPLING_HIT, 1.0f, 1.4f);
+        player.getLocation().getWorld().playSound(player.getEyeLocation(), Sound.BLOCK_BAMBOO_SAPLING_HIT, 2.0f, 0.7f);
 
     }
 }
