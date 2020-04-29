@@ -5,6 +5,7 @@ import com.kitsune.escobar.narcotic.Narcotic;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.potion.PotionEffect;
@@ -58,6 +59,12 @@ public class Cocaine extends Narcotic {
 
         // Duration is in ticks, so multiply by 20
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 * 20, 1));
+
+        // Decrease amount
+        player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
+
+        // Play "Sniff" sound
+        player.playSound(player.getLocation(), Sound.BLOCK_BAMBOO_SAPLING_HIT, 1.0f, 1.4f);
 
     }
 }
