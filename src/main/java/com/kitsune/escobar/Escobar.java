@@ -31,7 +31,7 @@ public final class Escobar extends JavaPlugin {
         // Register different xtc types
         narcoticManager.registerNarcotic(new XTC("honey_xtc", 1.5d, Material.HONEYCOMB, ChatColor.YELLOW + "Honey flavour"));
         narcoticManager.registerNarcotic(new XTC("apple_xtc", 2.5d, Material.APPLE, ChatColor.RED + "Apple flavour"));
-        narcoticManager.registerNarcotic(new XTC("chicken_xtc", 1, Material.COOKED_CHICKEN, ChatColor.GOLD + "Chicken flavour"));
+        narcoticManager.registerNarcotic(new XTC("berry_xtc", 1, Material.SWEET_BERRIES, ChatColor.RED + "Berry flavour"));
 
         getCommand("hat").setExecutor(new HatCommand());
     }
