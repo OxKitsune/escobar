@@ -1,10 +1,12 @@
 package com.kitsune.escobar.narcotic.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.kitsune.escobar.Escobar;
 import com.kitsune.escobar.narcotic.Narcotic;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ShapedRecipe;
@@ -40,9 +42,9 @@ public class MDMA extends Narcotic {
     public void applyEffect(Player player) {
 
         // Apply effects
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20, 2));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 60 * 20, 2));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 60 * 20, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 * 20, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 40 * 20, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, 40 * 20, 2));
 
         // Decrease amount
         player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
@@ -55,7 +57,7 @@ public class MDMA extends Narcotic {
     public void onRegister() {
 
         // Add crafting recipe to server
-        ShapedRecipe shapedRecipe = new ShapedRecipe(getItemStack(1));
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(Escobar.getInstance(), getId()), getItemStack(1));
         shapedRecipe.shape("ADA", "GQG", "ADA");
 
         shapedRecipe.setIngredient('A', Material.AIR);

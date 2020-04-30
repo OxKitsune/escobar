@@ -1,10 +1,12 @@
 package com.kitsune.escobar.narcotic.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.kitsune.escobar.Escobar;
 import com.kitsune.escobar.narcotic.Narcotic;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ShapedRecipe;
@@ -48,8 +50,8 @@ public class XTC extends Narcotic {
     @Override
     public void applyEffect(Player player) {
 
-        int duration = (int) Math.floor(100 * 20 * strength);
-        int effectStrength =  1 + (int) Math.round(strength);
+        int duration = (int) Math.floor(30 * 20 * strength);
+        int effectStrength =  (int) Math.round(strength);
 
         // Apply effects
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, effectStrength));
@@ -68,7 +70,7 @@ public class XTC extends Narcotic {
     public void onRegister() {
 
         // Add crafting recipe to server
-        ShapedRecipe shapedRecipe = new ShapedRecipe(getItemStack(1));
+        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(Escobar.getInstance(), getId()), getItemStack(1));
         shapedRecipe.shape("ADA", "GTG", "ADA");
 
         shapedRecipe.setIngredient('A', Material.AIR);
