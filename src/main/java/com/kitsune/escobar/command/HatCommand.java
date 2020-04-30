@@ -1,5 +1,7 @@
 package com.kitsune.escobar.command;
 
+import com.kitsune.escobar.narcotic.impl.lsd.FloatingBlock;
+import com.kitsune.escobar.util.Logger;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;

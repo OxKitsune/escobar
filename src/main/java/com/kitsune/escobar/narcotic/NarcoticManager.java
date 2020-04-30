@@ -1,5 +1,6 @@
 package com.kitsune.escobar.narcotic;
 
+import com.kitsune.escobar.narcotic.impl.lsd.TripManager;
 import com.kitsune.escobar.narcotic.listener.NarcoticListener;
 
 import java.util.Collection;
@@ -15,6 +16,10 @@ public class NarcoticManager {
         this.narcotics = new HashMap<>();
 
         new NarcoticListener(this);
+
+
+        // Init trip manager
+        TripManager.getInstance();
     }
 
     /**

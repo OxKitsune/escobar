@@ -43,10 +43,15 @@ public class NarcoticListener implements Listener {
                 .stream()
                 .filter(n -> n.getItemStack(1).isSimilar(e.getItem()))
                 .findFirst()
-                .ifPresent(narcotic -> narcotic.applyEffect(e.getPlayer()));
+                .ifPresent(narcotic -> {
+                    narcotic.applyEffect(e.getPlayer());
 
-        // Cancel event
-        e.setCancelled(true);
+                    // Cancel event
+                    e.setCancelled(true);
+                });
+
+
+
     }
 
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)

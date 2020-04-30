@@ -3,6 +3,7 @@ package com.kitsune.escobar;
 import com.kitsune.escobar.command.HatCommand;
 import com.kitsune.escobar.narcotic.NarcoticManager;
 import com.kitsune.escobar.narcotic.impl.Cocaine;
+import com.kitsune.escobar.narcotic.impl.lsd.LSD;
 import com.kitsune.escobar.narcotic.impl.MDMA;
 import com.kitsune.escobar.narcotic.impl.XTC;
 import net.md_5.bungee.api.ChatColor;
@@ -32,6 +33,8 @@ public final class Escobar extends JavaPlugin {
         narcoticManager.registerNarcotic(new XTC("honey_xtc", 1.5d, Material.HONEYCOMB, ChatColor.YELLOW + "Honey flavour"));
         narcoticManager.registerNarcotic(new XTC("apple_xtc", 2.5d, Material.APPLE, ChatColor.RED + "Apple flavour"));
         narcoticManager.registerNarcotic(new XTC("berry_xtc", 1, Material.SWEET_BERRIES, ChatColor.RED + "Berry flavour"));
+
+        narcoticManager.registerNarcotic(new LSD());
 
         getCommand("hat").setExecutor(new HatCommand());
     }
