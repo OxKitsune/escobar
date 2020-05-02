@@ -8,6 +8,7 @@ import com.kitsune.escobar.util.Logger;
 import com.kitsune.escobar.util.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,8 +20,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.logging.Level;
@@ -56,8 +59,12 @@ public class TripListener implements Listener {
                 if(levelled.getLevel() == 0){
                     tripManager.fillCauldron(block);
 
-                    e.getPlayer().getEquipment().getItemInMainHand().setAmount(e.getPlayer().getEquipment().getItemInMainHand().getAmount()-1);
-                    e.getPlayer().updateInventory();
+                    // Remove LSD from bucket if player is not in creative
+                    if(e.getPlayer().getGameMode() != GameMode.CREATIVE){
+                        e.getPlayer().getEquipment().setItemInMainHand(new ItemStack(Material.BUCKET));
+                        e.getPlayer().updateInventory();
+                    }
+
                     e.getPlayer().getWorld().playSound(block.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 0.9f);
 
                     // Player particle effects
@@ -68,6 +75,17 @@ public class TripListener implements Listener {
                 }
 
             }
+        }
+
+    }
+
+    @EventHandler
+    public void onCraftItemEvent (CraftItemEvent e){
+
+        // Crafting LSD
+        if(e.getCurrentItem().isSimilar(TripManager.getInstance().getLiquidLSD())){
+            ((CraftingInventory)e.getClickedInventory()).setMatrix(new ItemStack[9]);
+            e.getWhoClicked().setItemOnCursor(e.getRecipe().getResult());
         }
 
     }

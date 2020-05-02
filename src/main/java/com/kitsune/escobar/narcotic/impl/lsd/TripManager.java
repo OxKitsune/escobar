@@ -2,31 +2,24 @@ package com.kitsune.escobar.narcotic.impl.lsd;
 
 import com.google.common.collect.ImmutableList;
 import com.kitsune.escobar.Escobar;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.TripEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripDarknessEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripEntityEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripFloatingBlockEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripNightVisionEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripParanoiaSoundEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripSkyEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripSlowEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripSoundEffect;
+import com.kitsune.escobar.narcotic.impl.lsd.effect.impl.TripSpeedEffect;
 import com.kitsune.escobar.narcotic.impl.lsd.listener.TripListener;
-import com.kitsune.escobar.util.Logger;
-import com.kitsune.escobar.util.MathUtils;
-import com.kitsune.escobar.util.ReflectionUtils;
-import javafx.geometry.Pos;
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_15_R1.EntityFallingBlock;
-import net.minecraft.server.v1_15_R1.EntityTypes;
-import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.PacketPlayOutEntity;
-import net.minecraft.server.v1_15_R1.PacketPlayOutEntityTeleport;
-import net.minecraft.server.v1_15_R1.PacketPlayOutSpawnEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftFallingBlock;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -36,20 +29,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import sun.rmi.runtime.Log;
 
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class TripManager {
 
@@ -62,9 +47,13 @@ public class TripManager {
     /* List of tripping player */
     private Map<Player, Integer> trippingPlayers;
 
+    /* List of trip effects */
+    private List<TripEffect> tripEffects;
+
     public TripManager () {
         this.lsdCauldrons = new ArrayList<>();
         this.trippingPlayers = new HashMap<>();
+        this.tripEffects = new ArrayList<>();
 
         new TripListener(this);
 
@@ -78,83 +67,38 @@ public class TripManager {
 
         }, 30, 5);
 
-        List<Float> skyColours = ImmutableList.of(
-                0f,
-                3.0f,
-                4.0f
-        );
+        tripEffects.add(new TripSpeedEffect());
+        tripEffects.add(new TripSlowEffect());
+        tripEffects.add(new TripNightVisionEffect());
+        tripEffects.add(new TripParanoiaSoundEffect());
+        tripEffects.add(new TripFloatingBlockEffect());
+        tripEffects.add(new TripEntityEffect());
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                int speedCount = 0;
-                int slowCount = 0;
-
-                for (Player player : trippingPlayers.keySet()) {
+        // Make darkness effect more common
+        tripEffects.add(new TripDarknessEffect());
+        tripEffects.add(new TripDarknessEffect());
+        tripEffects.add(new TripDarknessEffect());
 
 
-                    if(MathUtils.randomInt(0, 100) <= trippingPlayers.get(player)){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20, 3));
-                    }
+        // Add trip sound twice to make it more common
+        tripEffects.add(new TripSoundEffect());
+        tripEffects.add(new TripSoundEffect());
 
-                    if(MathUtils.randomInt(0, 100) < 5 * trippingPlayers.get(player)){
-                        changeSkyColour(player, skyColours.get((int) Math.floor(Math.random() * skyColours.size())));
-                    }
+        // Make sky effect VERY common
+        tripEffects.add(new TripSkyEffect());
+        tripEffects.add(new TripSkyEffect());
+        tripEffects.add(new TripSkyEffect());
+        tripEffects.add(new TripSkyEffect());
 
-                    if(speedCount == 3){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) Math.floor(25 * (1.2 * trippingPlayers.get(player))), 2));
-                    }
+        // Apply trip effects
+        Bukkit.getScheduler().runTaskTimer(Escobar.getInstance(), () -> {
 
-                    if(slowCount == 6){
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) Math.floor(25 * (1.2 * trippingPlayers.get(player))), 4));
+            trippingPlayers.keySet().forEach(player -> {
+                tripEffects.get((int) Math.floor(Math.random() * tripEffects.size())).applyEffect(player);
+            });
 
-                    }
+        }, 30, 20);
 
-                    if(MathUtils.randomInt(0, 100) <= 10 * trippingPlayers.get(player)){
-                        int amount = MathUtils.randomInt(2, 6) * trippingPlayers.get(player);
-
-                        List<Material> possibleBlocks = Arrays.stream(Material.values()).filter(Material::isBlock).collect(Collectors.toList());
-
-                        for(int i = 0; i < amount; i++){
-
-                            Block block = player.getWorld().getBlockAt(player.getLocation().getBlockX() + MathUtils.randomInt(-30, 30), player.getLocation().getBlockY() + MathUtils.randomInt(-3, 3), player.getLocation().getBlockZ() + MathUtils.randomInt(-30, 30));
-
-                            new FloatingBlock(block.getLocation().clone().add(0, 1, 0), possibleBlocks.get((int) Math.floor(Math.random() * possibleBlocks.size())).createBlockData(), player).startFloating();
-
-                        }
-                    }
-
-                    speedCount++;
-                    slowCount++;
-
-                    if(speedCount > 3){
-                        speedCount = 0;
-                    }
-
-                    if(slowCount > 6){
-                        slowCount = 0;
-                    }
-                }
-            }
-        }.runTaskTimer(Escobar.getInstance(), 30, 10);
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                for (Player player : trippingPlayers.keySet()) {
-                    if (player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-                        player.removePotionEffect(PotionEffectType.BLINDNESS);
-                    }
-                    else {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10 * trippingPlayers.get(player), 3));
-                    }
-                }
-
-            }
-        }.runTaskTimer(Escobar.getInstance(), 30, 4);
 
     }
 
@@ -317,84 +261,25 @@ public class TripManager {
     }
 
     /**
-     * Changes the sky-box colour for the player.
+     * Removes the trip from the player if they're tripping.
      *
-     * @param player   the player
-     * @param fadeTime the time it takes to fade
-     * @param colour   the colour of the sky-box
+     * @param player - the player
      */
-    public void changeSkyColour (Player player, float fadeTime, float colour) {
-        sendPacket(player, Skybox.FADE_TIME, fadeTime);
-        sendPacket(player, Skybox.FADE_VALUE, colour);
-    }
-
-    /**
-     * Changes the sky-box colour for the player.
-     *
-     * @param player the player
-     * @param colour the colour of the sky-box
-     */
-    public void changeSkyColour (Player player, float colour){
-        sendPacket(player, Skybox.FADE_VALUE, colour);
-    }
-
-    private Object getConnection(Player player) throws SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException {
-        Class<?> ocbPlayer = ReflectionUtils.getOCBClass("entity.CraftPlayer");
-        Method getHandle = ReflectionUtils.getMethod(ocbPlayer, "getHandle");
-        Object nmsPlayer = getHandle.invoke(player);
-        Field conField = nmsPlayer.getClass().getField("playerConnection");
-        return conField.get(nmsPlayer);
-    }
-
-    /**
-     * Sends a packet that changes the skybox for the player.
-     *
-     * @param player    the target player
-     * @param skybox    a constant declared in {@link Skybox}
-     * @param number    the value that represents the colour
-     *
-     * @return          {@code true} if the packet has been sent successfully, or else {@code false}
-     */
-    private void sendPacket(Player player, Skybox skybox, float number) {
-        try {
-            Class<?> packetClass = ReflectionUtils.getNMSClass("PacketPlayOutGameStateChange");
-            Constructor<?> packetConstructor = packetClass.getConstructor(int.class, float.class);
-            Object packet = packetConstructor.newInstance(skybox.getValue(), number);
-            Method sendPacket = ReflectionUtils.getNMSClass("PlayerConnection").getMethod("sendPacket", ReflectionUtils.getNMSClass("Packet"));
-            sendPacket.invoke(this.getConnection(player), packet);
-        } catch (Exception e) {
-            Logger.error("Packet error: " + e);
-            e.printStackTrace();
-        }
-    }
-
     public void removeTrippingPlayer(Player player) {
 
         trippingPlayers.remove(player);
         player.removePotionEffect(PotionEffectType.CONFUSION);
-        changeSkyColour(player, 0);
-
+        TripSkyEffect.resetSkyColour(player);
     }
 
-    public enum Skybox {
-        /**
-         * This value represents the value that the skybox will fade to.
-         */
-        FADE_VALUE(7),
-        /**
-         * This value represents the tame it takes to fade for the skybox.
-         */
-        FADE_TIME(8);
-
-        private final int value;
-
-        Skybox(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
+    /**
+     * Get the trip intensity for the player.
+     *
+     * @param player - the player
+     *
+     * @return - the trip intensity if the player is tripping or else {@code 0}
+     */
+    public int getTripIntensity (Player player){
+        return trippingPlayers.getOrDefault(player, 0);
     }
 }

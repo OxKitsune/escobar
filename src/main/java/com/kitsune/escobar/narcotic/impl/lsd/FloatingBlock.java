@@ -3,6 +3,7 @@ package com.kitsune.escobar.narcotic.impl.lsd;
 import com.kitsune.escobar.Escobar;
 import com.kitsune.escobar.util.Logger;
 import com.kitsune.escobar.util.MathUtils;
+import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_15_R1.EntityFallingBlock;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.IBlockData;
@@ -10,6 +11,7 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_15_R1.PacketPlayOutEntityMetadata;
 import net.minecraft.server.v1_15_R1.PacketPlayOutEntityTeleport;
 import net.minecraft.server.v1_15_R1.PacketPlayOutSpawnEntity;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,6 +22,7 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 import java.lang.reflect.Field;
 
@@ -40,8 +43,10 @@ public class FloatingBlock {
     }
 
 
-    public void startFloating () {
-
+    /**
+     * Creates the floating block for the player
+     */
+    public void createFloatingBlock () {
         IBlockData blockData = CraftMagicNumbers.getBlock(block.getMaterial()).getBlockData();
         entityFallingBlock = new EntityFallingBlock(EntityTypes.FALLING_BLOCK, ((CraftWorld)location.getWorld()).getHandle());
 
@@ -61,57 +66,40 @@ public class FloatingBlock {
             PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(entityFallingBlock.getId(), entityFallingBlock.getDataWatcher(), true);
 
 
-
-            ((CraftPlayer)player).getHandle().playerConnection.sendPacket(entityPacket);
-            ((CraftPlayer)player).getHandle().playerConnection.sendPacket(entityMetadataPacket);
-
-
-            new BukkitRunnable() {
-                int count = 0;
-
-                @Override
-                public void run() {
-
-                    entityFallingBlock.getBukkitEntity().teleport(location.add(0, 0.25f, 0));
-                    PacketPlayOutEntityTeleport packetTeleport = new PacketPlayOutEntityTeleport(entityFallingBlock);
-                    ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packetTeleport);
-
-                    if(count == 4){
-
-                        new BukkitRunnable() {
-
-                            int count = 0;
-
-                            @Override
-                            public void run() {
-
-                                entityFallingBlock.getBukkitEntity().teleport(location.add(MathUtils.randomDouble(-2.5d, 2.5d), 0.25f, MathUtils.randomDouble(-2.5d, 2.5d)));
-                                PacketPlayOutEntityTeleport packetTeleport = new PacketPlayOutEntityTeleport(entityFallingBlock);
-                                ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packetTeleport);
-
-                                if(count >= 20){
-
-                                    ((CraftPlayer)player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityFallingBlock.getId()));
-
-                                    this.cancel();
-                                }
-
-                                count++;
-                            }
-                        }.runTaskTimer(Escobar.getInstance(), MathUtils.randomInt(1, 10), 5);
-
-                        this.cancel();
-                    }
-
-                    count++;
-                }
-            }.runTaskTimer(Escobar.getInstance(), 0, 1);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityPacket);
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityMetadataPacket);
+        }
+        catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * Set the glow of the block.
+     *
+     * @param glow - the glow
+     */
+    public void setGlow (boolean glow) {
+        entityFallingBlock.getBukkitEntity().setGlowing(glow);
 
+        PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(entityFallingBlock.getId(), entityFallingBlock.getDataWatcher(), true);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityMetadataPacket);
+    }
+
+    /**
+     * Teleport the floating block.
+     *
+     * @param location - the target location
+     */
+    public void teleport (Location location){
+
+        entityFallingBlock.setPosition(location.getX(), location.getY(), location.getZ());
+        PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(entityFallingBlock);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
 
     }
 
+    public void destroy() {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityFallingBlock.getId()));
+    }
 }
